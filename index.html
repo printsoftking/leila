@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Profit Manager - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="login-overlay">
+        <div class="card login-card">
+            <h2>Select Agent</h2>
+            <div class="agent-buttons">
+                <button class="btn btn-primary agent-btn" onclick="login('Leila')">Leila</button>
+                <button class="btn btn-primary agent-btn" onclick="login('Zahira')">Zahira</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-content" style="display: none;">
+        <div class="container">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>IPTV Profit Manager</h1>
+                <div id="agent-info" class="badge badge-strong" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                    Agent: <span id="current-agent-name"></span>
+                    <button onclick="logout()"
+                        style="background: none; border: none; color: inherit; cursor: pointer; text-decoration: underline; margin-left: 1rem; font-size: 0.8rem;">Logout</button>
+                </div>
+            </header>
+
+            <!-- Stats Dashboard -->
+            <div class="dashboard-grid">
+                <div class="card stat-card">
+                    <div class="stat-label">Total Revenue</div>
+                    <div id="total-revenue" class="stat-value">0.00 MAD</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-label">Panel Costs</div>
+                    <div id="panel-costs" class="stat-value">0.00 MAD</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-label">Ad Spend</div>
+                    <div id="ad-spend" class="stat-value">0.00 MAD</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-label">Net Profit (Total)</div>
+                    <div id="net-profit" class="stat-value profit">0.00 MAD</div>
+                </div>
+            </div>
+
+            <!-- Daily Resume Section -->
+            <div class="card">
+                <h2>Daily Resume (Net Profit)</h2>
+                <div class="table-container">
+                    <table id="daily-resume-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Revenue</th>
+                                <th>Panel Costs</th>
+                                <th>Ad Spend</th>
+                                <th>Net Profit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daily-resume-body">
+                            <!-- Daily summaries will appear here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <!-- Customer Form -->
+                <div class="card">
+                    <h2 id="form-title">Add Customer</h2>
+                    <form id="customer-form">
+                        <input type="hidden" id="edit-id">
+                        <div class="form-group">
+                            <label for="customer-id">Email or WhatsApp</label>
+                            <input type="text" id="customer-id" placeholder="e.g. user@example.com / +1234..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="server-panel">Select Panel</label>
+                            <select id="server-panel" required>
+                                <option value="Strong">Strong</option>
+                                <option value="Dino">Dino</option>
+                                <option value="TRX">TRX</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sub-price">Subscription Price (MAD)</label>
+                            <input type="number" id="sub-price" step="0.01" placeholder="500.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="panel-price">Panel Unit Price (MAD)</label>
+                            <input type="number" id="panel-price" step="0.01" placeholder="100.00" required>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="submit" id="submit-btn" class="btn btn-primary">Add Transaction</button>
+                            <button type="button" id="cancel-edit" class="btn btn-secondary"
+                                style="display: none;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Ad Spend Form -->
+                <div class="card">
+                    <h2>Daily Ad Spend</h2>
+                    <form id="ads-form">
+                        <div class="form-group">
+                            <label for="ad-platform">Platform</label>
+                            <select id="ad-platform">
+                                <option value="Facebook">Facebook Ads</option>
+                                <option value="Google">Google Ads</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ad-amount">Amount Spent (MAD)</label>
+                            <input type="number" id="ad-amount" step="0.01" placeholder="200.00" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Log Ad Spend</button>
+                    </form>
+
+                    <div style="margin-top: 2rem;">
+                        <h3>Logged Ad Spends</h3>
+                        <div id="ad-spend-list" style="font-size: 0.875rem; color: var(--text-secondary);">
+                            <!-- Ad spend items will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="card">
+                <h2>Recent Transactions</h2>
+                <div class="table-container">
+                    <table id="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Panel</th>
+                                <th>Agent</th>
+                                <th>Sub Price</th>
+                                <th>Panel Cost</th>
+                                <th>Net Profit</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-body">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
